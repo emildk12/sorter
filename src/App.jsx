@@ -77,7 +77,6 @@ function App() {
             }
             if (Math.abs(y[j] - yCoodinate) < Math.abs(y[closestIndex] - yCoodinate) && j != grabbedSquare) {
                 closestIndex = j;
-
             }
         }
         return closestIndex;
