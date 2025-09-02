@@ -11,7 +11,6 @@ function App() {
     const [y, setY] = useState([200, 250, 300, 350, 400]);
     const [adjustment, setAdjustment] = useState(0);
     const [grabbedSquare, setGrabbedSquare] = useState(0);
-    // see whether red square has moved from positioning of the orange
     const [click, setClick] = useState(false);
     const [closestSquare, setClosestSquare] = useState(0);
 
