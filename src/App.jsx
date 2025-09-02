@@ -17,8 +17,8 @@ function App() {
 
     function handlePointerDown(e, i) {
         e.target.setPointerCapture(e.targetId);
-        // adjust y position of orange square so it dosen't pop around on pointer down
         setGrabbedSquare(i);
+        // adjust y position of grabbed square so it dosen't pop around on pointer down
         setAdjustment(e.clientY - y[i]);
         setClosestSquare(findClosestSquare(y[i]));
         setClick(true);
