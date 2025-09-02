@@ -88,6 +88,7 @@ function App() {
                 style={{
                     background: color,
                     position: 'absolute',
+                    cursor: 'grab',
                     left:x, 
                     top:y[i],
                     width: size.width,
