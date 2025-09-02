@@ -12,6 +12,7 @@ function App() {
     const [adjustment, setAdjustment] = useState(0);
     const [grabbedSquare, setGrabbedSquare] = useState(0);
     const [click, setClick] = useState(false);
+    // index of closest square
     const [closestSquare, setClosestSquare] = useState(0);
 
     function handlePointerDown(e, i) {
