@@ -30,92 +30,55 @@ function App() {
         setPop(adjustPop);
         setClick(true);
     }
-    function handlePointerUp() {
-        // litt bugga den her, bør kanskje lete gjennom y for å se om det finnes et tomrom, også gå inn i tomrommet
-        setClick(false);
-        const newY = [...y];
-        const closestSquare = findClosestSquare(y[grabbedSquare]);
-        // ensure grabbed square pops into place
-        if (y[grabbedSquare] < y[closestSquare]) {
-            newY[grabbedSquare] = y[closestSquare] - size.height;
-            for(let i = 0; i < newY.length; i++) {
-                if (i != grabbedSquare && newY[grabbedSquare] == newY[i]) {
-                    console.log("WARNING 1!!!!");
+    function handlePointerUp(e) {
+
+        if (click) {
+            const lastY = moveSquare(e);
+            const newY = [...lastY];
+            // ensure grabbed square pops into place
+            const emptySpace = lastY.map(() => true);
+            let i = 0;
+            for(; i < lastY.length; i++) {
+                if(i != grabbedSquare) {
+                    emptySpace[(lastY[i] - startY)/size.height] = false; 
                 }
             }
-        }
-        else if (y[grabbedSquare] > y[closestSquare]){
-            newY[grabbedSquare] = y[closestSquare] + size.height;
-            for(let i = 0; i < newY.length; i++) {
-                if (i != grabbedSquare && newY[grabbedSquare] == newY[i]) {
-                    console.log("WARNING 2!!!!");
-                }
-            }
-        }
-        else {
-            // possible edge case bug
-            // må kanksje refaktorere handlemousemove inne i if click inn i en egen funksjon og gå gjennom den en siste gang her
-            console.log("WARNING 3!!!!");
-            
-        }
-        setY(newY);
-        setPop(pop.map(() => false));
-        console.log(closestSquare);
-        for (let i = 0; i < y.length; i++) {
-            for (let j = i + 1; j < y.length; j++) {
-                if (y[i] == y[j]) {
-                    console.log("ERROR: " + grabbedSquare + " ldkwlkdw" + newY);
-                    return;
-                }
-            }
+            for(i = 0; !emptySpace[i]; i++);
+            newY[grabbedSquare] = size.height*i + startY;
+
+            setY(newY);
+            setPop(pop.map(() => false));
+            setClick(false);
         }
     }
     
     function handleMouseMove(e) {
         if(click) {
-            const newY = [...y];
-            newY[grabbedSquare] = e.clientY - adjustment;
-            for(let i = 0; i < y.length; i++) {
-                if (i != grabbedSquare) {
-                    if (y[grabbedSquare] - 10 < y[i] && pop[i]) {
-                        newY[i] = y[i] + size.height;
-                        doPop(i);
-                    }
-                    else if (y[grabbedSquare] + 10 > y[i] && !pop[i]) {
-                        newY[i] = y[i] - size.height;
-                        doPop(i);
-                    }
-                }
-            }
+            const newY = moveSquare(e);
             setY(newY);
         }
     }
-    function doPop(i) {
-        const newPop = [...pop];
-        newPop[i] = !newPop[i];
-        setPop(newPop);
-    }
-    function findClosestSquare(yCoodinate) {
-        let closestIndex = 0;
-        let j = 1;
-        if (closestIndex == grabbedSquare) {
-            closestIndex++;
-            j++;
-        }
-        if(Math.abs(y[closestIndex] - yCoodinate) < 25) {
-            return closestIndex;
-        }
-        for(; j < y.length; j++) {
-            if(Math.abs(y[j] - yCoodinate) < 25 && j != grabbedSquare) {
-                return j;
-            }
-            if (Math.abs(y[j] - yCoodinate) < Math.abs(y[closestIndex] - yCoodinate) && j != grabbedSquare) {
-                closestIndex = j;
-            }
-        }
-        return closestIndex;
-    }
+    function moveSquare(e) {
 
+            const newY = [...y];
+            const newPop = [...pop];
+            newY[grabbedSquare] = e.clientY - adjustment;
+            for(let i = 0; i < y.length; i++) {
+                if (i != grabbedSquare) {
+                    if (newY[grabbedSquare] - 10 < newY[i] && pop[i]) {
+                        newY[i] = newY[i] + size.height;
+                        newPop[i] = !newPop[i];
+                    }
+                    else if (newY[grabbedSquare] + 10 > newY[i] && !pop[i]) {
+                        newY[i] = newY[i] - size.height;
+                        newPop[i] = !newPop[i];
+                    }
+                }
+            }
+            setPop(newPop);
+            return newY;
+    }
+    // making the squares
     const squares = y.map((yCoordinate, i) => {
         return (
             <div key={i}
@@ -149,86 +112,6 @@ function App() {
         <>  
             <button onClick={handleButtonClick}>Add Square</button>
             {squares}
-            {/* <div
-                key={0}
-                style={{
-                    background: "white",
-                    position: 'absolute',
-                    left:x, 
-                    top:y[0],
-                    width: size.width,
-                    height: size.height
-                }}
-                onMouseMove={handleMouseMove}
-                onPointerDown={e => {
-                    handlePointerDown(e, 0);
-                }}
-                onPointerUp={handlePointerUp}
-            />
-            <div
-                key={1}
-                style={{
-                    background: "orange",
-                    position: 'absolute',
-                    left:x, 
-                    top:y[1],
-                    width: size.width,
-                    height: size.height
-                }}
-                onMouseMove={handleMouseMove}
-                onPointerDown={e => {
-                    handlePointerDown(e, 1);
-                }}
-                onPointerUp={handlePointerUp}
-            />
-            <div
-                key={2}
-                style={{
-                    background: "red",
-                    position: 'absolute',
-                    left:x, 
-                    top:y[2],
-                    width: size.width,
-                    height: size.height
-                }}
-                onMouseMove={handleMouseMove}
-                onPointerDown={e => {
-                    handlePointerDown(e, 2);
-                }}
-                onPointerUp={handlePointerUp}
-            />
-            <div
-                key={3}
-                style={{
-                    background: "chartreuse",
-                    position: 'absolute',
-                    left:x, 
-                    top:y[3],
-                    width: size.width,
-                    height: size.height
-                }}
-                onMouseMove={handleMouseMove}
-                onPointerDown={e => {
-                    handlePointerDown(e, 3);
-                }}
-                onPointerUp={handlePointerUp}
-            />
-            <div
-                key={4}
-                style={{
-                    background: "deepskyblue",
-                    position: 'absolute',
-                    left:x, 
-                    top:y[4],
-                    width: size.width,
-                    height: size.height
-                }}
-                onMouseMove={handleMouseMove}
-                onPointerDown={e => {
-                    handlePointerDown(e, 4);
-                }}
-                onPointerUp={handlePointerUp}
-            />   */}
         </>
     );
 }
