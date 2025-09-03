@@ -50,11 +50,11 @@ function App() {
             newY[grabbedSquare] = e.clientY - adjustment;
             for(let i = 0; i < y.length; i++) {
                 if (i != grabbedSquare) {
-                    if (y[grabbedSquare] < y[i] && pop[i]) {
+                    if (y[grabbedSquare] - 10 < y[i] && pop[i]) {
                         newY[i] = y[i] + size.height;
                         doPop(i);
                     }
-                    else if (y[grabbedSquare] > y[i] && !pop[i]) {
+                    else if (y[grabbedSquare] + 10 > y[i] && !pop[i]) {
                         newY[i] = y[i] - size.height;
                         doPop(i);
                     }
