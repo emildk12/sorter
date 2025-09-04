@@ -46,7 +46,6 @@ function App() {
             newY[grabbedSquare] = size.height*i + startY;
 
             setY(newY);
-            setPop(pop.map(() => false));
             setClick(false);
         }
     }
