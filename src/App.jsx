@@ -20,7 +20,7 @@ function App() {
         setGrabbedSquare(i);
         // adjust y position of grabbed square so it dosen't pop around on pointer down
         setAdjustment(e.clientY - y[i]);
-        // adjusting the pop array so squares above grabbed square is true
+        // adjusting the pop array so squares above grabbed square is true, simplifies moveSquare logic
         const adjustPop = pop.map( (p, j) => {
             if (j != i && y[j] < y[i]) {
                 return true;
@@ -33,14 +33,13 @@ function App() {
     function handlePointerUp(e) {
 
         if (click) {
-            const lastY = moveSquare(e);
-            const newY = [...lastY];
-            // ensure grabbed square pops into place
-            const emptySpace = lastY.map(() => true);
+            const newY = moveSquare(e);
+            // ensure grabbed square pops into the empty space
+            const emptySpace = newY.map(() => true);
             let i = 0;
-            for(; i < lastY.length; i++) {
+            for(; i < newY.length; i++) {
                 if(i != grabbedSquare) {
-                    emptySpace[(lastY[i] - startY)/size.height] = false; 
+                    emptySpace[(newY[i] - startY)/size.height] = false; 
                 }
             }
             for(i = 0; !emptySpace[i]; i++);
@@ -60,21 +59,22 @@ function App() {
     }
     function moveSquare(e) {
 
-            const newY = [...y];
             const newPop = [...pop];
-            newY[grabbedSquare] = e.clientY - adjustment;
-            for(let i = 0; i < y.length; i++) {
+            const grabbedY = e.clientY - adjustment;
+            const newY = y.map((yCoordinate, i) => {
                 if (i != grabbedSquare) {
-                    if (newY[grabbedSquare] - 10 < newY[i] && pop[i]) {
-                        newY[i] = newY[i] + size.height;
+                    if (grabbedY - 10 < yCoordinate && pop[i]) {
                         newPop[i] = !newPop[i];
+                        return yCoordinate + size.height;
                     }
-                    else if (newY[grabbedSquare] + 10 > newY[i] && !pop[i]) {
-                        newY[i] = newY[i] - size.height;
+                    else if (grabbedY + 10 > yCoordinate && !pop[i]) {
                         newPop[i] = !newPop[i];
+                        return yCoordinate - size.height;
                     }
+                    return yCoordinate;
                 }
-            }
+                return grabbedY;
+            });
             setPop(newPop);
             return newY;
     }
